@@ -1,6 +1,7 @@
 package im.shimo.react.prompt;
 
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -12,14 +13,8 @@ import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.EditText;
-import android.graphics.Color;
+
 import javax.annotation.Nullable;
-import android.graphics.LinearGradient;
-import android.graphics.Shader;
-import android.text.Html;
-import android.text.SpannableString;
-
-
 
 public class RNPromptFragment extends DialogFragment implements DialogInterface.OnClickListener {
 
@@ -58,6 +53,7 @@ public class RNPromptFragment extends DialogFragment implements DialogInterface.
         mListener = null;
     }
 
+    @SuppressLint("ValidFragment")
     public RNPromptFragment(@Nullable RNPromptModule.PromptFragmentListener listener, Bundle arguments) {
         mListener = listener;
         setArguments(arguments);
@@ -66,13 +62,8 @@ public class RNPromptFragment extends DialogFragment implements DialogInterface.
 
     public static Dialog createDialog(
             Context activityContext, Bundle arguments, RNPromptFragment fragment) {
-              int colorId = Color.parseColor("#009fe3");
-              String title = arguments.getString(ARG_TITLE);
-              String formStart = "<big><font color='Black'>";
-              String formEnd = "</font></big>";
-              String formattedTitle = formStart + title + formEnd;
         AlertDialog.Builder builder = new AlertDialog.Builder(activityContext)
-        .setTitle(Html.fromHtml(formattedTitle));
+                .setTitle(arguments.getString(ARG_TITLE));
 
         if (arguments.containsKey(ARG_BUTTON_POSITIVE)) {
             builder.setPositiveButton(arguments.getString(ARG_BUTTON_POSITIVE), fragment);
@@ -85,12 +76,8 @@ public class RNPromptFragment extends DialogFragment implements DialogInterface.
         }
         // if both message and items are set, Android will only show the message
         // and ignore the items argument entirely
-        String subTitle = arguments.getString(ARG_MESSAGE);
-        String subTitleStart = "<br /><br /><font color='Gray'>";
-        String subTitleEnd = "</font></span>";
-        String formattedSubTitle = subTitleStart + subTitle + subTitleEnd;
         if (arguments.containsKey(ARG_MESSAGE)) {
-            builder.setMessage(Html.fromHtml(formattedSubTitle));
+            builder.setMessage(arguments.getString(ARG_MESSAGE));
         }
 
         if (arguments.containsKey(ARG_ITEMS)) {
@@ -112,13 +99,14 @@ public class RNPromptFragment extends DialogFragment implements DialogInterface.
         if (arguments.containsKey(ARG_TYPE)) {
             switch (typeString) {
                 case "secure-text":
-                    type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+                    type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
                     break;
                 case "plain-text":
                 default:
-                    type = InputType.TYPE_CLASS_TEXT;
+                    type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
             }
         }
+
         input.setInputType(type);
         fragment.setTextInput(input);
 
@@ -128,15 +116,20 @@ public class RNPromptFragment extends DialogFragment implements DialogInterface.
                 input.setText(defaultValue);
                 int textLength = input.getText().length();
                 input.setSelection(textLength, textLength);
-                input.getPaint().setColor(colorId);
             }
         }
 
         if (arguments.containsKey(ARG_PLACEHOLDER)) {
             input.setHint(arguments.getString(ARG_PLACEHOLDER));
         }
-      //  builder.setTitle(arguments.getString(ARG_TITLE));
-        alertDialog.setView(input, 50, 40, 40, 50);
+
+        // set input style
+        ShapeDrawable shape = new ShapeDrawable(new RectShape());
+        shape.getPaint().setColor(activityContext.getResources().getColor(android.R.color.holo_blue_light));
+        shape.getPaint().setStyle(Paint.Style.STROKE);
+        shape.getPaint().setStrokeWidth(3);
+        input.setBackground(shape);
+        alertDialog.setView(input, 10, 15, 10, 0);
 
         return alertDialog;
     }
