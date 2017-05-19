@@ -6,6 +6,11 @@ export default function prompt(
     title: ?string,
     message?: ?string,
     callbackOrButtons?: ?((text: string) => void) | Object,
+    options?: ?Object
 ): void {
-    AlertIOS.prompt(title, message, callbackOrButtons);
-};
+    const type = options && options.type ? options.type : null;
+    const defaultValue = options && options.defaultValue
+        ? options.defaultValue
+        : null;
+    AlertIOS.prompt(title, message, callbackOrButtons, type, defaultValue);
+}
