@@ -18,6 +18,7 @@ import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.text.Html;
 import android.text.SpannableString;
+import android.view.WindowManager;
 
 
 
@@ -147,7 +148,9 @@ public class RNPromptFragment extends DialogFragment implements DialogInterface.
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return createDialog(getActivity(), getArguments(), this);
+        Dialog dialog = createDialog(getActivity(), getArguments(), this);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        return dialog;
     }
 
     @Override
